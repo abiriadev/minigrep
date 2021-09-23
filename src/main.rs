@@ -1,9 +1,7 @@
 use std::{env, process};
 
 fn main() {
-    let args: Vec<String> = env::args().collect();
-
-    let config = minigrep::Config::new(&args).unwrap_or_else(|err_message| {
+    let config = minigrep::Config::new(env::args()).unwrap_or_else(|err_message| {
         eprintln!("{}", err_message);
         process::exit(1);
     });

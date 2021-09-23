@@ -26,15 +26,27 @@ pub struct Config {
 }
 
 impl Config {
-    pub fn new(args: &[String]) -> Result<Config, &'static str> {
-        if args.len() < 3 {
-            return Err(
-                "you must provide at least 2 arguments, which is target string and file name.",
-            );
-        }
+    pub fn new(mut args: std::env::Args) -> Result<Config, &'static str> {
+        args.next();
 
-        let query = args[1].clone();
-        let filename = args[2].clone();
+        let query = match args.next() {
+            None => return Err("you must specify the word to search"),
+            Some(arg) => arg,
+        };
+
+        let filename = match args.next() {
+            None => return Err("you must specify the target file"),
+            Some(arg) => arg,
+        };
+
+        // if args.len() < 3 {
+        //     return Err(
+        //         "you must provide at least 2 arguments, which is target string and file name.",
+        //     );
+        // }
+
+        // let query = args[1].clone();
+        // let filename = args[2].clone();
         let case_sensitive = env::var("CASE_INSENSITIVE").is_err();
 
         Ok(Config {
@@ -46,15 +58,10 @@ impl Config {
 }
 
 pub fn search<'a>(query: &str, content: &'a str) -> Vec<&'a str> {
-    let mut results = vec![];
-
-    for line in content.lines() {
-        if line.contains(query) {
-            results.push(line);
-        }
-    }
-
-    results
+    content
+        .lines()
+        .filter(|line| line.contains(query))
+        .collect()
 }
 
 pub fn search_case_insensitive<'a>(query: &str, content: &'a str) -> Vec<&'a str> {
